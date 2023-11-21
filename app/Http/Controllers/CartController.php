@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -90,4 +91,13 @@ class CartController extends Controller
 
         return response('', 204);
     }
+    public function print(Request $request)
+{
+    $order = Order::findOrFail($request->orderId);
+
+    // Fetch order items with product details
+    $orderItems = $order->items()->with('product')->get();
+
+    return view('order.print', compact('orderItems'));
+}
 }

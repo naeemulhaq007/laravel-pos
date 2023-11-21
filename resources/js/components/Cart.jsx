@@ -3,6 +3,8 @@ import ReactDOM from "react-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { sum } from "lodash";
+import { CustomBill } from './CustomBill';
+import ReactDOMServer from 'react-dom/server';
 
 class Cart extends Component {
     constructor(props) {
@@ -173,35 +175,129 @@ class Cart extends Component {
     setCustomerId(event) {
         this.setState({ customer_id: event.target.value });
     }
+    // handleClickSubmit() {
+    //     Swal.fire({
+    //       title: "Received Amount",
+    //       input: "text",
+    //       inputValue: this.getTotal(this.state.cart),
+    //       showCancelButton: true,
+    //       confirmButtonText: "Send",
+    //       showLoaderOnConfirm: true,
+    //       preConfirm: (amount) => {
+    //         return axios
+    //           .post("/admin/orders", {
+    //             customer_id: this.state.customer_id,
+    //             amount,
+    //           })
+    //           .then((res) => {
+    //             this.loadCart();
+    //             return res.data;
+    //           })
+    //           .catch((err) => {
+    //             Swal.showValidationMessage(err.response.data.message);
+    //           });
+    //       },
+    //       allowOutsideClick: () => !Swal.isLoading(),
+    //     }).then((result) => {
+    //       if (result.value) {
+    //         Swal.fire({
+    //           title: "Order Sent Successfully",
+    //           text: "Do you want to print the order?",
+    //           showCancelButton: true,
+    //           confirmButtonText: "Print",
+    //           cancelButtonText: "No",
+    //         }).then((printResult) => {
+    //           if (printResult.value) {
+    //             // If the user clicks "Print"
+
+    //           } else if (printResult.dismiss === Swal.DismissReason.cancel) {
+    //             // If the user clicks "Cancel"
+    //             console.log("Print canceled");
+    //           } else if (printResult.dismiss === Swal.DismissReason.backdrop) {
+    //             // If the user clicks outside the modal
+    //             console.log("Clicked outside the modal");
+    //           }
+    //         });
+    //       } else if (result.dismiss === Swal.DismissReason.cancel) {
+    //         // If the user clicks "Cancel"
+    //         console.log("Order submission canceled");
+    //       } else if (result.dismiss === Swal.DismissReason.backdrop) {
+    //         // If the user clicks outside the modal
+    //         console.log("Clicked outside the modal");
+    //       }
+    //     });
+    //   }
     handleClickSubmit() {
         Swal.fire({
-            title: "Received Amount",
-            input: "text",
-            inputValue: this.getTotal(this.state.cart),
-            showCancelButton: true,
-            confirmButtonText: "Send",
-            showLoaderOnConfirm: true,
-            preConfirm: (amount) => {
-                return axios
-                    .post("/admin/orders", {
-                        customer_id: this.state.customer_id,
-                        amount,
-                    })
-                    .then((res) => {
-                        this.loadCart();
-                        return res.data;
-                    })
-                    .catch((err) => {
-                        Swal.showValidationMessage(err.response.data.message);
-                    });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
+          title: "Received Amount",
+          input: "text",
+          inputValue: this.getTotal(this.state.cart),
+          showCancelButton: true,
+          confirmButtonText: "Send",
+          showLoaderOnConfirm: true,
+          preConfirm: (amount) => {
+            return axios
+              .post("/admin/orders", {
+                customer_id: this.state.customer_id,
+                amount,
+              })
+              .then((res) => {
+                this.loadCart();
+                return res.data;
+              })
+              .catch((err) => {
+                Swal.showValidationMessage(err.response.data.message);
+              });
+          },
+          allowOutsideClick: () => !Swal.isLoading(),
         }).then((result) => {
-            if (result.value) {
-                //
-            }
+          if (result.value) {
+            Swal.fire({
+              title: "Order Sent Successfully",
+              text: "Do you want to print the order?",
+              showCancelButton: true,
+              confirmButtonText: "Print",
+              cancelButtonText: "No",
+            }).then((printResult) => {
+              if (printResult.value) {
+                console.log(result.value);
+                // window.location.href = `Printer/${result.value}`;
+                window.open(`Printer/${result.value}`, '_blank');
+
+
+              } else if (printResult.dismiss === Swal.DismissReason.cancel) {
+                // If the user clicks "Cancel"
+                console.log("Print canceled");
+              } else if (printResult.dismiss === Swal.DismissReason.backdrop) {
+                // If the user clicks outside the modal
+                console.log("Clicked outside the modal");
+              }
+            });
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // If the user clicks "Cancel"
+            console.log("Order submission canceled");
+          } else if (result.dismiss === Swal.DismissReason.backdrop) {
+            // If the user clicks outside the modal
+            console.log("Clicked outside the modal");
+          }
         });
-    }
+      }
+
+
+      createCustomBill() {
+        const { cart } = this.state;
+
+        // Import CustomBill component from CustomBill.jsx
+        const CustomBillComponent = require('./CustomBill').CustomBill;
+
+        // Render the JSX component to a string
+        const billContent = ReactDOMServer.renderToStaticMarkup(
+          <CustomBillComponent cart={cart} />
+        );
+
+        return billContent;
+      }
+
     render() {
         const { cart, products, customers, barcode } = this.state;
         return (
@@ -224,7 +320,7 @@ class Cart extends Component {
                                 className="form-control"
                                 onChange={this.setCustomerId}
                             >
-                                <option value="">Walking Customer</option>
+                                <option value="">WalkIn Customer</option>
                                 {customers.map((cus) => (
                                     <option
                                         key={cus.id}

@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\Printer;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,4 +29,14 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::post('/cart/change-qty', [CartController::class, 'changeQty']);
     Route::delete('/cart/delete', [CartController::class, 'delete']);
     Route::delete('/cart/empty', [CartController::class, 'empty']);
+    // routes/web.php
+    Route::any('Printer/{orderId}', [Printer::class, 'index']);
+
+    Route::match(['get', 'post'], 'Printer/{orderId}', [Printer::class, 'index']);
+
+// Route::get('/order/print/{orderId}', 'OrderController@print')->name('order.print');
+// web.php or api.php
+// Route::match(['get', 'post'], '/admin/orders/print', 'OrderController@print');
+
+
 });

@@ -63,4 +63,5 @@ public function print(Request $request)
 
     return view('order.print', compact('orderItems'));
 }
+
 }
